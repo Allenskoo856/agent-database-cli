@@ -14,7 +14,7 @@ MySQL · PostgreSQL · Redis · Oracle · MongoDB · Read-only mode · Command b
   <img src="https://img.shields.io/badge/release-v0.1.0-blue" alt="release v0.1.0">
 </p>
 
-[Installation](#installation) · [Configuration](#configuration) · [Commands](#commands) · [Oracle SQLcl](#oracle-sqlcl) · [Docker Tests](#docker-tests) · [License](#license)
+[AI One-Click Installation](#ai-one-click-installation) · [Installation](#installation) · [Configuration](#configuration) · [Commands](#commands) · [Oracle SQLcl](#oracle-sqlcl) · [Docker Tests](#docker-tests) · [License](#license)
 
 [中文](README.md) | English
 
@@ -49,6 +49,12 @@ Driver configuration table:
 | MongoDB | `mongodb` | npm package `mongodb` | Not switchable yet; `database` can set the default database | `readonly`, `blacklist`, `keepAliveSeconds` |
 
 ## Installation
+
+### AI One-Click Installation
+
+```text
+Please read https://github.com/sleepinginsummer/database-cli/blob/main/AI_INSTALL.md, follow the instructions to install the CLI, and add `SKILL.md`.
+```
 
 ### Requirements
 
