@@ -5,7 +5,7 @@ import { loadConfig, resolveConfigPath } from "../config.js";
 import { ConnectionManager } from "../connection-manager.js";
 import type { DaemonRequest, DaemonResponse } from "../types.js";
 import { toErrorMessage } from "../utils/masking.js";
-import { PID_PATH, SOCKET_PATH } from "./paths.js";
+import { isWindowsNamedPipe, PID_PATH, SOCKET_PATH } from "./paths.js";
 
 const DAEMON_IDLE_SECONDS = 300;
 let manager: ConnectionManager | undefined;
@@ -61,8 +61,11 @@ async function handleRequest(request: DaemonRequest): Promise<DaemonResponse> {
 }
 
 async function start(): Promise<void> {
-  await mkdir(dirname(SOCKET_PATH), { recursive: true });
-  await rm(SOCKET_PATH, { force: true });
+  await mkdir(dirname(PID_PATH), { recursive: true });
+  if (!isWindowsNamedPipe(SOCKET_PATH)) {
+    await mkdir(dirname(SOCKET_PATH), { recursive: true });
+    await rm(SOCKET_PATH, { force: true });
+  }
   const server = net.createServer((socket) => {
     let input = "";
     socket.on("data", (chunk) => {
@@ -120,7 +123,9 @@ async function shutdown(code: number): Promise<void> {
   if (manager) {
     await manager.closeAll();
   }
-  await rm(SOCKET_PATH, { force: true });
+  if (!isWindowsNamedPipe(SOCKET_PATH)) {
+    await rm(SOCKET_PATH, { force: true });
+  }
   await rm(PID_PATH, { force: true });
   process.exit(code);
 }

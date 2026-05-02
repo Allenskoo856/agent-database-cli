@@ -34,6 +34,7 @@ What it can do:
 - Keep connections through the local daemon; each database connection is released after `180` idle seconds by default
 - Switch Oracle between `oracledb` and SQLcl connection modes
 - It does not store or print unmasked passwords, tokens, or secrets
+- The daemon uses named pipes on Windows and Unix sockets on macOS/Linux
 
 Driver configuration table:
 
