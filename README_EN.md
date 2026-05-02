@@ -68,6 +68,17 @@ npm install -g github:sleepinginsummer/database-cli
 database-cli --help
 ```
 
+If GitHub installation fails during the `prepare` phase on Windows or in a restricted npm environment, use the equivalent source installation flow:
+
+```powershell
+git clone https://github.com/sleepinginsummer/database-cli.git
+cd database-cli
+npm install
+npm run build
+npm link
+database-cli --help
+```
+
 Add `SKILL.md` to the agent that needs to use this tool.
 
 ## Configuration

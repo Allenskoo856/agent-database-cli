@@ -68,6 +68,17 @@ npm install -g github:sleepinginsummer/database-cli
 database-cli --help
 ```
 
+如果 Windows 或受限 npm 环境在 GitHub 安装的 `prepare` 阶段失败，使用等价的源码安装方式：
+
+```powershell
+git clone https://github.com/sleepinginsummer/database-cli.git
+cd database-cli
+npm install
+npm run build
+npm link
+database-cli --help
+```
+
 添加skiil.md到需要使用的agent中
 
 ## 配置
