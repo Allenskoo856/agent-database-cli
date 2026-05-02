@@ -5,6 +5,7 @@ export type OutputFormat = "json" | "table";
 export interface DatabaseConfig {
   type: DatabaseType;
   url: string;
+  sshTunnel?: SshTunnelConfig;
   database?: string;
   oracleDriver?: "oracledb" | "sqlcl";
   sqlclPath?: string;
@@ -12,6 +13,17 @@ export interface DatabaseConfig {
   readonly?: boolean;
   blacklist?: string[];
   keepAliveSeconds?: number;
+}
+
+export interface SshTunnelConfig {
+  host: string;
+  port?: number;
+  username: string;
+  password?: string;
+  privateKeyPath?: string;
+  privateKey?: string;
+  passphrase?: string;
+  readyTimeout?: number;
 }
 
 export interface AppConfig {

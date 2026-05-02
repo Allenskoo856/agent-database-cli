@@ -45,6 +45,9 @@ function validateDatabaseConfig(name: string, db: DatabaseConfig): void {
   if (db.keepAliveSeconds !== undefined && (!Number.isInteger(db.keepAliveSeconds) || db.keepAliveSeconds <= 0)) {
     throw new Error(`数据库配置 ${name} 的 keepAliveSeconds 必须是正整数`);
   }
+  if (db.sshTunnel !== undefined) {
+    validateSshTunnelConfig(name, db.sshTunnel);
+  }
   if (db.oracleDriver !== undefined) {
     if (db.type !== "oracle") {
       throw new Error(`数据库配置 ${name} 只有 oracle 类型允许配置 oracleDriver`);
@@ -58,6 +61,54 @@ function validateDatabaseConfig(name: string, db: DatabaseConfig): void {
   }
   if (db.javaHome !== undefined && typeof db.javaHome !== "string") {
     throw new Error(`数据库配置 ${name} 的 javaHome 必须是字符串`);
+  }
+}
+
+function validateSshTunnelConfig(name: string, tunnel: DatabaseConfig["sshTunnel"]): void {
+  if (!tunnel || typeof tunnel !== "object") {
+    throw new Error(`数据库配置 ${name} 的 sshTunnel 必须是对象`);
+  }
+  if (!tunnel.host || typeof tunnel.host !== "string") {
+    throw new Error(`数据库配置 ${name} 的 sshTunnel.host 必须是非空字符串`);
+  }
+  if (tunnel.port !== undefined && (!Number.isInteger(tunnel.port) || tunnel.port <= 0 || tunnel.port > 65535)) {
+    throw new Error(`数据库配置 ${name} 的 sshTunnel.port 必须是 1-65535 的整数`);
+  }
+  if (!tunnel.username || typeof tunnel.username !== "string") {
+    throw new Error(`数据库配置 ${name} 的 sshTunnel.username 必须是非空字符串`);
+  }
+  if (tunnel.password !== undefined && typeof tunnel.password !== "string") {
+    throw new Error(`数据库配置 ${name} 的 sshTunnel.password 必须是字符串`);
+  }
+  if (tunnel.password === "") {
+    throw new Error(`数据库配置 ${name} 的 sshTunnel.password 不能为空字符串`);
+  }
+  if (tunnel.privateKeyPath !== undefined && typeof tunnel.privateKeyPath !== "string") {
+    throw new Error(`数据库配置 ${name} 的 sshTunnel.privateKeyPath 必须是字符串`);
+  }
+  if (tunnel.privateKeyPath === "") {
+    throw new Error(`数据库配置 ${name} 的 sshTunnel.privateKeyPath 不能为空字符串`);
+  }
+  if (tunnel.privateKey !== undefined && typeof tunnel.privateKey !== "string") {
+    throw new Error(`数据库配置 ${name} 的 sshTunnel.privateKey 必须是字符串`);
+  }
+  if (tunnel.privateKey === "") {
+    throw new Error(`数据库配置 ${name} 的 sshTunnel.privateKey 不能为空字符串`);
+  }
+  if (tunnel.privateKeyPath && tunnel.privateKey) {
+    throw new Error(`数据库配置 ${name} 的 sshTunnel.privateKeyPath 和 privateKey 只能配置一个`);
+  }
+  if (!tunnel.password && !tunnel.privateKeyPath && !tunnel.privateKey) {
+    throw new Error(`数据库配置 ${name} 的 sshTunnel 必须配置 password、privateKeyPath 或 privateKey`);
+  }
+  if (tunnel.passphrase !== undefined && typeof tunnel.passphrase !== "string") {
+    throw new Error(`数据库配置 ${name} 的 sshTunnel.passphrase 必须是字符串`);
+  }
+  if (tunnel.passphrase && !tunnel.privateKeyPath && !tunnel.privateKey) {
+    throw new Error(`数据库配置 ${name} 的 sshTunnel.passphrase 只能和私钥一起使用`);
+  }
+  if (tunnel.readyTimeout !== undefined && (!Number.isInteger(tunnel.readyTimeout) || tunnel.readyTimeout <= 0)) {
+    throw new Error(`数据库配置 ${name} 的 sshTunnel.readyTimeout 必须是正整数`);
   }
 }
 

@@ -6,21 +6,21 @@ import { OracleSqlclAdapter } from "./oracle-sqlcl.js";
 import { PostgresAdapter } from "./postgres.js";
 import { RedisAdapter } from "./redis.js";
 
-export function createAdapter(config: DatabaseConfig): DatabaseAdapter {
+export function createAdapter(config: DatabaseConfig, url = config.url): DatabaseAdapter {
   switch (config.type) {
     case "mysql":
-      return new MySqlAdapter(config.url);
+      return new MySqlAdapter(url);
     case "postgres":
-      return new PostgresAdapter(config.url);
+      return new PostgresAdapter(url);
     case "redis":
-      return new RedisAdapter(config.url);
+      return new RedisAdapter(url);
     case "oracle":
       if (config.oracleDriver === "sqlcl") {
-        return new OracleSqlclAdapter(config.url, config.sqlclPath, config.javaHome);
+        return new OracleSqlclAdapter(url, config.sqlclPath, config.javaHome);
       }
-      return new OracleAdapter(config.url);
+      return new OracleAdapter(url);
     case "mongodb":
-      return new MongoDbAdapter(config.url, config.database);
+      return new MongoDbAdapter(url, config.database);
     default:
       throw new Error(`不支持的数据库类型: ${(config as DatabaseConfig).type}`);
   }

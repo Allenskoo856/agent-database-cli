@@ -1,32 +1,18 @@
 import { mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import net from "node:net";
 import { dirname } from "node:path";
-import { loadConfig, resolveConfigPath } from "../config.js";
-import { ConnectionManager } from "../connection-manager.js";
 import type { DaemonRequest, DaemonResponse } from "../types.js";
 import { toErrorMessage } from "../utils/masking.js";
+import { DaemonConfigManager } from "./config-manager.js";
 import { isWindowsNamedPipe, PID_PATH, SOCKET_PATH } from "./paths.js";
 
 const DAEMON_IDLE_SECONDS = 300;
-let manager: ConnectionManager | undefined;
-let activeConfigPath = "";
+const configManager = new DaemonConfigManager();
 let idleTimer: NodeJS.Timeout | undefined;
-
-async function getManager(configPath?: string): Promise<ConnectionManager> {
-  const path = configPath || resolveConfigPath();
-  if (!manager || activeConfigPath !== path) {
-    if (manager) {
-      await manager.closeAll();
-    }
-    manager = new ConnectionManager(await loadConfig(path));
-    activeConfigPath = path;
-  }
-  return manager;
-}
 
 async function handleRequest(request: DaemonRequest): Promise<DaemonResponse> {
   if (request.action === "status") {
-    return { ok: true, data: manager?.status() ?? { connections: [] } };
+    return { ok: true, data: configManager.status() };
   }
   if (request.action === "stop") {
     setTimeout(() => {
@@ -38,7 +24,7 @@ async function handleRequest(request: DaemonRequest): Promise<DaemonResponse> {
     throw new Error("daemon 请求必须提供 db");
   }
 
-  const current = await getManager(request.configPath);
+  const current = await configManager.getManager(request.configPath);
   if (request.action === "test") {
     return { ok: true, data: await current.test(request.db) };
   }
@@ -120,9 +106,7 @@ async function shutdown(code: number): Promise<void> {
   if (idleTimer) {
     clearTimeout(idleTimer);
   }
-  if (manager) {
-    await manager.closeAll();
-  }
+  await configManager.closeAll();
   if (!isWindowsNamedPipe(SOCKET_PATH)) {
     await rm(SOCKET_PATH, { force: true });
   }

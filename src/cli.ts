@@ -1,4 +1,7 @@
 #!/usr/bin/env node
+import { readFileSync } from "node:fs";
+import { dirname, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
 import { Command } from "commander";
 import { loadConfig, listSupportedDatabases, resolveConfigPath } from "./config.js";
 import { daemonStatus, startDaemon, stopDaemon } from "./daemon/control.js";
@@ -8,11 +11,12 @@ import type { MetadataRequest, OutputFormat } from "./types.js";
 import { toErrorMessage } from "./utils/masking.js";
 
 const program = new Command();
+const packageVersion = readPackageVersion();
 
 program
   .name("database-cli")
   .description("统一数据库命令行工具")
-  .version("0.1.0")
+  .version(packageVersion)
   .option("--format <format>", "输出格式: json 或 table", "json");
 
 program.command("list").description("展示支持的数据库类型").action(async () => {
@@ -118,6 +122,16 @@ async function main(fn: () => Promise<void>): Promise<void> {
     process.stderr.write(`${toErrorMessage(error)}\n`);
     process.exitCode = 1;
   }
+}
+
+function readPackageVersion(): string {
+  const currentFile = fileURLToPath(import.meta.url);
+  const packageJsonPath = resolve(dirname(currentFile), "../package.json");
+  const packageJson = JSON.parse(readFileSync(packageJsonPath, "utf8")) as { version?: unknown };
+  if (typeof packageJson.version !== "string" || packageJson.version.length === 0) {
+    throw new Error("package.json 缺少有效的 version");
+  }
+  return packageJson.version;
 }
 
 await program.parseAsync(process.argv);

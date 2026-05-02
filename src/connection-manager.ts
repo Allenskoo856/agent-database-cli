@@ -2,10 +2,12 @@ import type { AppConfig, DatabaseAdapter, DatabaseConfig, MetadataRequest, Query
 import { getDatabaseConfig } from "./config.js";
 import { assertCommandAllowed } from "./security.js";
 import { createAdapter } from "./adapters/factory.js";
+import { startSshTunnel, type StartedSshTunnel } from "./ssh-tunnel.js";
 
 interface Entry {
   adapter: DatabaseAdapter;
   config: DatabaseConfig;
+  tunnel?: StartedSshTunnel;
   timer?: NodeJS.Timeout;
 }
 
@@ -43,6 +45,9 @@ export class ConnectionManager {
         clearTimeout(entry.timer);
       }
       await entry.adapter.disconnect();
+      if (entry.tunnel) {
+        await entry.tunnel.close();
+      }
       this.entries.delete(name);
     }
     return { reset: name };
@@ -69,9 +74,17 @@ export class ConnectionManager {
     }
 
     const config = getDatabaseConfig(this.config, name);
-    const adapter = createAdapter(config);
-    await adapter.connect();
-    const entry = { adapter, config };
+    const tunnel = await startSshTunnel(config);
+    const adapter = createAdapter(config, tunnel?.url);
+    try {
+      await adapter.connect();
+    } catch (error) {
+      if (tunnel) {
+        await tunnel.close();
+      }
+      throw error;
+    }
+    const entry = { adapter, config, tunnel };
     this.entries.set(name, entry);
     this.touch(name, entry);
     return entry;

@@ -100,6 +100,7 @@ The configuration file is an object. Each key under `databases` is a database co
 
 - `type`: Database type. Supported values are `mysql`, `postgres`, `redis`, `oracle`, and `mongodb`
 - `url`: Database connection URL
+- `sshTunnel`: Optional SSH tunnel settings. When enabled, the database URL host and port are reached through the SSH tunnel
 - `database`: Default MongoDB database name, optional
 - `readonly`: Whether read-only mode is enabled
 - `blacklist`: Command blocklist array, case-insensitive
@@ -107,6 +108,17 @@ The configuration file is an object. Each key under `databases` is a database co
 - `oracleDriver`: Oracle driver, either `oracledb` or `sqlcl`
 - `sqlclPath`: SQLcl executable path, used only when `oracleDriver` is `sqlcl`
 - `javaHome`: `JAVA_HOME` used by SQLcl, optional
+
+`sshTunnel` supports password, private key, password plus private key, and passphrase-protected private key authentication:
+
+- `host`: SSH jump host
+- `port`: SSH port, defaults to `22`
+- `username`: SSH username
+- `password`: SSH password, optional
+- `privateKeyPath`: Private key file path, optional, supports `~`
+- `privateKey`: Private key content, optional, mutually exclusive with `privateKeyPath`
+- `passphrase`: Private key passphrase, optional and only valid with a private key
+- `readyTimeout`: SSH connection timeout in milliseconds, optional
 
 The blocklist is checked before read-only mode. If a command matches the blocklist, it is rejected immediately; otherwise the read-only check is applied.
 
@@ -120,6 +132,19 @@ Reference configuration:
       "url": "mysql://user:password@localhost:3306/app",
       "readonly": true,
       "blacklist": ["drop", "truncate", "delete"],
+      "keepAliveSeconds": 180
+    },
+    "remote-mysql": {
+      "type": "mysql",
+      "url": "mysql://user:password@db.internal:3306/app",
+      "sshTunnel": {
+        "host": "jump.example.com",
+        "port": 22,
+        "username": "deploy",
+        "privateKeyPath": "~/.ssh/id_rsa",
+        "passphrase": "key-passphrase"
+      },
+      "readonly": true,
       "keepAliveSeconds": 180
     },
     "cache": {

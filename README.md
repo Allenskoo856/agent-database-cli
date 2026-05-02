@@ -100,6 +100,7 @@ DATABASE_CLI_CONFIG=/path/to/config.json database-cli list
 
 - `type`: 数据库类型，支持 `mysql`、`postgres`、`redis`、`oracle`、`mongodb`
 - `url`: 数据库连接 URL
+- `sshTunnel`: SSH 隧道配置，可选；启用后数据库 URL 的 host/port 会通过 SSH 转发访问
 - `database`: MongoDB 默认数据库名，可选
 - `readonly`: 是否启用只读模式
 - `blacklist`: 命令黑名单数组，大小写不敏感
@@ -107,6 +108,17 @@ DATABASE_CLI_CONFIG=/path/to/config.json database-cli list
 - `oracleDriver`: Oracle 驱动，支持 `oracledb` 或 `sqlcl`
 - `sqlclPath`: SQLcl 可执行文件路径，仅 `oracleDriver: "sqlcl"` 时使用
 - `javaHome`: SQLcl 使用的 `JAVA_HOME`，可选
+
+`sshTunnel` 支持密码、私钥、密码加私钥、带通行短语的私钥认证：
+
+- `host`: SSH 跳板机地址
+- `port`: SSH 端口，默认 `22`
+- `username`: SSH 用户名
+- `password`: SSH 密码，可选
+- `privateKeyPath`: 私钥文件路径，可选，支持 `~`
+- `privateKey`: 私钥内容，可选，和 `privateKeyPath` 二选一
+- `passphrase`: 私钥通行短语，可选，仅配置私钥时允许使用
+- `readyTimeout`: SSH 连接超时时间，单位毫秒，可选
 
 黑名单和只读模式兼容，优先级固定为：先检查黑名单，命中直接拒绝；未命中再检查只读模式。
 
@@ -120,6 +132,19 @@ DATABASE_CLI_CONFIG=/path/to/config.json database-cli list
       "url": "mysql://user:password@localhost:3306/app",
       "readonly": true,
       "blacklist": ["drop", "truncate", "delete"],
+      "keepAliveSeconds": 180
+    },
+    "remote-mysql": {
+      "type": "mysql",
+      "url": "mysql://user:password@db.internal:3306/app",
+      "sshTunnel": {
+        "host": "jump.example.com",
+        "port": 22,
+        "username": "deploy",
+        "privateKeyPath": "~/.ssh/id_rsa",
+        "passphrase": "key-passphrase"
+      },
+      "readonly": true,
       "keepAliveSeconds": 180
     },
     "cache": {
