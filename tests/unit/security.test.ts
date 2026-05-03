@@ -43,4 +43,29 @@ describe("security", () => {
       )
     ).toThrow(SecurityError);
   });
+
+  it("未配置 readonly 时默认拒绝写命令", () => {
+    expect(() =>
+      assertCommandAllowed(
+        {
+          type: "mysql",
+          url: "mysql://user:pass@localhost/db"
+        },
+        "insert into users(id) values (1)"
+      )
+    ).toThrow(SecurityError);
+  });
+
+  it("显式关闭 readonly 后允许写命令", () => {
+    expect(() =>
+      assertCommandAllowed(
+        {
+          type: "mysql",
+          url: "mysql://user:pass@localhost/db",
+          readonly: false
+        },
+        "insert into users(id) values (1)"
+      )
+    ).not.toThrow();
+  });
 });

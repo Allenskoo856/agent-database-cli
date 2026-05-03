@@ -63,7 +63,8 @@ export function assertCommandAllowed(config: DatabaseConfig, command: string): v
   const head = getCommandHead(normalized, config.type);
   assertNotBlacklisted(config, normalized, head);
 
-  if (config.readonly && !isReadOnlyCommand(config.type, normalized)) {
+  // 默认开启只读，只有显式配置 readonly: false 才允许写操作。
+  if (isReadonlyEnabled(config) && !isReadOnlyCommand(config.type, normalized)) {
     throw new SecurityError(`只读模式拒绝执行命令: ${head || normalized}`);
   }
 }
@@ -89,6 +90,10 @@ export function isReadOnlyCommand(type: DatabaseType, command: string): boolean 
     return MONGO_READ_COMMANDS.has(getMongoCommandName(command));
   }
   return SQL_READ_COMMANDS.has(head);
+}
+
+function isReadonlyEnabled(config: DatabaseConfig): boolean {
+  return config.readonly !== false;
 }
 
 function getMongoCommandName(command: string): string {
