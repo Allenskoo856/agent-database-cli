@@ -1,6 +1,19 @@
 import type { DatabaseConfig, DatabaseType } from "./types.js";
 
 const SQL_READ_COMMANDS = new Set(["select", "show", "describe", "desc", "explain", "with"]);
+const SQL_WRITE_COMMANDS = [
+  "insert",
+  "update",
+  "delete",
+  "merge",
+  "replace",
+  "drop",
+  "truncate",
+  "alter",
+  "create",
+  "grant",
+  "revoke"
+];
 const REDIS_READ_COMMANDS = new Set([
   "get",
   "mget",
@@ -235,7 +248,11 @@ export function isReadOnlyCommand(type: DatabaseType, command: string): boolean 
   if (type === "mongodb") {
     return MONGO_READ_COMMANDS.has(getMongoCommandName(command));
   }
-  return SQL_READ_COMMANDS.has(head);
+  if (!SQL_READ_COMMANDS.has(head)) {
+    return false;
+  }
+  const sanitizedCommand = stripSqlLiteralsAndComments(command);
+  return !SQL_WRITE_COMMANDS.some((keyword) => hasBlacklistedKeyword(sanitizedCommand, keyword));
 }
 
 function isReadonlyEnabled(config: DatabaseConfig): boolean {

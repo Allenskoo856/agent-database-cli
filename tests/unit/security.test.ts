@@ -77,6 +77,17 @@ describe("security", () => {
     expect(isReadOnlyCommand("postgres", "delete from users")).toBe(false);
   });
 
+  it("SQL 只读模式忽略字符串、注释和字段名里的写关键字", () => {
+    expect(isReadOnlyCommand("oracle", "select FCREATETIME, 'create' as keyword from dual -- drop table ignored")).toBe(
+      true
+    );
+  });
+
+  it("SQL 只读模式拒绝读命令后拼接的写语句", () => {
+    expect(isReadOnlyCommand("mysql", "select 1; create table audit_log(id int)")).toBe(false);
+    expect(isReadOnlyCommand("postgres", "with rows as (select 1) delete from users")).toBe(false);
+  });
+
   it("Redis 只读模式只允许读命令", () => {
     expect(isReadOnlyCommand("redis", "GET user:1")).toBe(true);
     expect(isReadOnlyCommand("redis", "SET user:1 alice")).toBe(false);
