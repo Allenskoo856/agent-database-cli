@@ -240,7 +240,6 @@ database-cli reset --db "<databaseName>"
 
 SQLcl 模式通过 stdin 传入连接脚本，避免密码出现在命令行参数列表中。执行前仍会先走本地黑名单和只读检查。
 
-
 ## 错误规则
 
 - 配置文件 JSON 无效时失败
