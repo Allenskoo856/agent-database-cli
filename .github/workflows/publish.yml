@@ -142,7 +142,7 @@ jobs:
         run: npm install -g npm@11.5.1
 
       - name: Install main package dependencies
-        run: npm ci --omit=optional
+        run: npm install --omit=optional --package-lock=false --ignore-scripts --no-audit --no-fund
 
       - name: Publish main package
         shell: bash
