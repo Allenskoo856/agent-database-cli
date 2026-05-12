@@ -21,17 +21,25 @@ if (!packageName) {
 
 const currentDir = dirname(fileURLToPath(import.meta.url));
 const executableName = process.platform === "win32" ? "agent-database-cli.exe" : "agent-database-cli";
-const executablePath = join(currentDir, "..", "node_modules", packageName, "bin", executableName);
+const packageRoot = join(currentDir, "..");
+const installRoot = join(packageRoot, "..");
+
+const candidateExecutablePaths = [
+  // npm 正常安装时，平台子包与主包同级位于 node_modules/@agent-database-cli/*。
+  join(installRoot, packageName, "bin", executableName),
+  // 兼容极少数包管理器把 optionalDependencies 嵌套到主包 node_modules 的布局。
+  join(packageRoot, "node_modules", packageName, "bin", executableName)
+];
 
 const repoFallback = join(currentDir, "..", "target", "release", executableName);
 const devFallback = join(currentDir, "..", "target", "debug", executableName);
-const finalExecutablePath = existsSync(executablePath)
-  ? executablePath
-  : existsSync(repoFallback)
+const packagedExecutablePath = candidateExecutablePaths.find((candidate) => existsSync(candidate));
+const finalExecutablePath = packagedExecutablePath
+  ?? (existsSync(repoFallback)
     ? repoFallback
     : existsSync(devFallback)
       ? devFallback
-      : undefined;
+      : undefined);
 
 if (!finalExecutablePath) {
   console.error(`未找到平台二进制: ${packageName}`);
