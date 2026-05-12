@@ -11,8 +11,8 @@ MySQL · PostgreSQL · Redis · Oracle · MongoDB · Read-only mode · Command b
   <img src="https://img.shields.io/badge/License-MIT-green" alt="License MIT">
   <img src="https://img.shields.io/badge/Node.js-%3E%3D20-339933?logo=node.js&logoColor=white" alt="Node.js >=20">
   <img src="https://img.shields.io/badge/npm-%3E%3D10-CB3837?logo=npm&logoColor=white" alt="npm >=10">
-  <img src="https://img.shields.io/badge/Windows-MacOS-0078D6?labelColor=0078D6&color=C0C0C0" alt="Windows/MacOS">
-  <img src="https://img.shields.io/badge/release-v0.2.6-blue" alt="release v0.2.6">
+  <img src="https://img.shields.io/badge/Windows%20%7C%20Linux%20%7C%20macOS-supported-0078D6" alt="Windows/Linux/macOS">
+  <img src="https://img.shields.io/badge/release-v0.2.12-blue" alt="release v0.2.12">
 </p>
 
 [AI One-Click Installation](#ai-one-click-installation) · [Installation](#installation) · [Configuration](#configuration) · [Permission Configuration](#permission-configuration) · [Oracle SQLcl](#oracle-sqlcl) · [License](#license) · [Friendly Links](#friendly-links)
@@ -41,12 +41,12 @@ Driver configuration table:
 
 | Database | `type` | Default driver | Driver switch configuration | Common configuration |
 | --- | --- | --- | --- | --- |
-| MySQL | `mysql` | npm package `mysql2` | Not switchable yet | `readonly`, `blacklist`, `keepAliveSeconds` |
-| PostgreSQL | `postgres` | npm package `pg` | Not switchable yet | `readonly`, `blacklist`, `keepAliveSeconds` |
-| Redis standalone | `redis` | npm package `redis` | Configure `url` only | `readonly`, `blacklist`, `keepAliveSeconds` |
-| Redis cluster | `redis` | npm package `redis` | Configure both `url` and `redisCluster.nodes` | `readonly`, `blacklist`, `keepAliveSeconds` |
+| MySQL | `mysql` | Native Rust driver `mysql_async` | Not switchable yet | `readonly`, `blacklist`, `keepAliveSeconds` |
+| PostgreSQL | `postgres` | Native Rust driver `tokio-postgres` | Not switchable yet | `readonly`, `blacklist`, `keepAliveSeconds` |
+| Redis standalone | `redis` | Native Rust driver `redis` | Configure `url` only | `readonly`, `blacklist`, `keepAliveSeconds` |
+| Redis cluster | `redis` | Native Rust driver `redis` | Configure both `url` and `redisCluster.nodes` | `readonly`, `blacklist`, `keepAliveSeconds` |
 | Oracle | `oracle` | SQLcl | `oracleDriver: "sqlcl" \| "oracle" \| "oracledb"`; defaults to SQLcl when omitted. Native drivers require Oracle Instant Client | `readonly`, `blacklist`, `keepAliveSeconds` |
-| MongoDB | `mongodb` | npm package `mongodb` | Not switchable yet; `database` can be configured as the default database | `readonly`, `blacklist`, `keepAliveSeconds` |
+| MongoDB | `mongodb` | Native Rust driver `mongodb` | Not switchable yet; `database` can be configured as the default database | `readonly`, `blacklist`, `keepAliveSeconds` |
 
 ## Installation
 
@@ -54,10 +54,21 @@ Driver configuration table:
 
 - Node.js `>= 20`
 - npm `>= 10`
-- The matching Rust binary subpackage is installed automatically for your platform
+- The matching Rust binary subpackage is installed automatically for your platform. Supported targets: macOS x64/arm64, Linux x64/arm64, Windows x64
 - Local network access to the target database
 - Docker and Docker Compose if you run integration tests
 - SQLcl and Java installed locally if Oracle uses SQLcl
+
+Supported platform subpackages:
+
+| OS | Architecture | npm subpackage | Rust target |
+| --- | --- | --- | --- |
+| macOS | arm64 | `@agent-database-cli/darwin-arm64` | `aarch64-apple-darwin` |
+| macOS | x64 | `@agent-database-cli/darwin-x64` | `x86_64-apple-darwin` |
+| Linux | arm64 | `@agent-database-cli/linux-arm64` | `aarch64-unknown-linux-gnu` |
+| Linux | x64 | `@agent-database-cli/linux-x64` | `x86_64-unknown-linux-gnu` |
+| Windows | x64 | `@agent-database-cli/win32-x64` | `x86_64-pc-windows-msvc` |
+
 
 ### AI One-Click Installation
 

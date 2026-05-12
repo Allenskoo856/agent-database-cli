@@ -27,7 +27,7 @@ node --version
 npm --version
 ```
 
-需要 Node.js `>= 20` 和 npm `>= 10`。
+需要 Node.js `>= 20` 和 npm `>= 10`。当前预编译二进制支持 macOS x64/arm64、Linux x64/arm64、Windows x64。
 
 ## 2. 初始化配置目录
 
