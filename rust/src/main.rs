@@ -3,6 +3,7 @@ mod config;
 mod daemon;
 mod output;
 mod runtime;
+mod secrets;
 mod security;
 mod ssh_tunnel;
 mod types;

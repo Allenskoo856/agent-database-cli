@@ -12,7 +12,7 @@ MySQL · PostgreSQL · Redis · Oracle · MongoDB · Read-only mode · Command b
   <img src="https://img.shields.io/badge/Node.js-%3E%3D20-339933?logo=node.js&logoColor=white" alt="Node.js >=20">
   <img src="https://img.shields.io/badge/npm-%3E%3D10-CB3837?logo=npm&logoColor=white" alt="npm >=10">
   <img src="https://img.shields.io/badge/sys-win%2Fmac%2Flinux-0078D6" alt="sys win/mac/linux">
-  <img src="https://img.shields.io/badge/release-v0.2.18-blue" alt="release v0.2.18">
+  <img src="https://img.shields.io/badge/release-v0.2.19-blue" alt="release v0.2.19">
 </p>
 
 [AI One-Click Installation](#ai-one-click-installation) · [Installation](#installation) · [Configuration](#configuration) · [Permission Configuration](#permission-configuration) · [Oracle SQLcl](#oracle-sqlcl) · [License](#license) · [Friendly Links](#friendly-links)
@@ -144,10 +144,14 @@ Redis cluster notes:
 - `port`: SSH port, default `22`
 - `username`: SSH username
 - `password`: Optional SSH password
+- `passwordRef`: Local encrypted reference for the SSH password. Generated automatically when a plaintext `password` is first used
 - `privateKeyPath`: Optional private key file path, supports `~`
 - `privateKey`: Optional private key content, mutually exclusive with `privateKeyPath`
 - `passphrase`: Optional private key passphrase, only valid when a private key is configured
+- `passphraseRef`: Local encrypted reference for the private key passphrase. Generated automatically when a plaintext `passphrase` is first used
 - `readyTimeout`: Optional SSH connection timeout in milliseconds
+
+Sensitive values are passively encrypted the first time the target connection is used. Plaintext database URL passwords, `sshTunnel.password`, and `sshTunnel.passphrase` are stored in `secrets.json` under the config directory, with a local `secret.key`; the config is rewritten with the plaintext cleared and the corresponding `*Ref` populated. Later runs decrypt only in memory. To change a password, write a new plaintext value back into the field and use the connection again.
 
 The blocklist and read-only mode work together with a fixed priority: check the blocklist first, reject immediately on match, and only check read-only mode when no blocklist rule matches.
 

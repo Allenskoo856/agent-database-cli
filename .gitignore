@@ -3,5 +3,6 @@ dist/
 .database-cli/
 coverage/
 *.log
+.DS_Store
 
 target/

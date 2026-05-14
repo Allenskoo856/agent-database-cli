@@ -102,6 +102,7 @@ AGENT_DATABASE_CLI_CONFIG=/path/to/config.json agent-database-cli list
 
 - `type`: `mysql`、`postgres`、`redis`、`oracle`、`mongodb`
 - `url`: 数据库连接 URL
+- `passwordRef`: 数据库 URL 密码的本地密文引用，首次使用明文 URL 密码时自动生成
 - `database`: MongoDB 默认数据库名，可选
 - `readonly`: 是否启用只读模式
 - `blacklist`: 命令黑名单数组，大小写不敏感
@@ -109,6 +110,10 @@ AGENT_DATABASE_CLI_CONFIG=/path/to/config.json agent-database-cli list
 - `oracleDriver`: Oracle 驱动，可选 `oracledb` 或 `sqlcl`
 - `sqlclPath`: SQLcl 可执行文件路径
 - `javaHome`: SQLcl 使用的 `JAVA_HOME`
+- `sshTunnel.passwordRef`: SSH 密码的本地密文引用，首次使用明文 `sshTunnel.password` 时自动生成
+- `sshTunnel.passphraseRef`: SSH 私钥口令的本地密文引用，首次使用明文 `sshTunnel.passphrase` 时自动生成
+
+首次使用连接时，CLI 会把数据库 URL 明文密码、`sshTunnel.password`、`sshTunnel.passphrase` 加密保存到配置目录的 `secrets.json`，生成本地 `secret.key`，并把配置文件改写为对应 `*Ref`。后续只在内存中解密使用；改密码时重新填入明文字段即可覆盖旧密文。
 
 ## 全局参数
 

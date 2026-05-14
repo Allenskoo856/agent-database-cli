@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.2.19
+
+- 安全优化：数据库 URL 明文密码、SSH 隧道密码和私钥口令在首次使用连接时自动迁移到本地加密存储，配置文件仅保留 `passwordRef` / `passphraseRef`。
+- 兼容性优化：保留明文字段改密入口，重新填写明文密码后下次使用会覆盖旧密文。
+
 ## 0.2.18
 
 - Bugfix: `daemon status` 在 daemon 未运行或 Unix socket 残留时返回明确的未运行状态，避免直接暴露 `Connection refused`。

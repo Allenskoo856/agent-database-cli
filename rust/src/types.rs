@@ -34,6 +34,7 @@ pub struct DatabaseConfig {
     #[serde(rename = "type")]
     pub db_type: DatabaseType,
     pub url: String,
+    pub password_ref: Option<String>,
     pub redis_cluster: Option<RedisClusterConfig>,
     pub ssh_tunnel: Option<SshTunnelConfig>,
     pub database: Option<String>,
@@ -66,9 +67,11 @@ pub struct SshTunnelConfig {
     pub port: Option<u16>,
     pub username: String,
     pub password: Option<String>,
+    pub password_ref: Option<String>,
     pub private_key_path: Option<String>,
     pub private_key: Option<String>,
     pub passphrase: Option<String>,
+    pub passphrase_ref: Option<String>,
     pub ready_timeout: Option<u64>,
 }
 
