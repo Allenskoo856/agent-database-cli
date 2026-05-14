@@ -23,7 +23,7 @@ MySQL · PostgreSQL · Redis · Oracle · MongoDB · Read-only mode · Command b
 
 ## Introduction
 
-`agent-database-cli` references the database adapter, config loading, safety checking, and connection management layering of [Anarkh-Lee/universal-db-mcp](https://github.com/Anarkh-Lee/universal-db-mcp), then rewrites it into a standalone CLI form without MCP, HTTP, or SSE services.
+`agent-database-cli` is a local multi-database CLI tool for Agents, implemented in Rust to provide connection, query, metadata inspection, read-only control, command blocklist, and password encryption capabilities for MySQL, PostgreSQL, Redis, Oracle, and MongoDB.
 
 What it can do:
 
