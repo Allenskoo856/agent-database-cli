@@ -59,18 +59,24 @@ impl RedisAdapter {
         let Some(cluster) = &self.redis_cluster else {
             return Ok(None);
         };
-        let Some(map) = &cluster.node_address_map else {
-            return Ok(None);
+        let url = if let Some(map) = &cluster.node_address_map {
+            let Some(local) = map.get(target) else {
+                return Ok(None);
+            };
+            rewrite_redis_url(&self.url, &local.host, local.port)?
+        } else {
+            cluster
+                .nodes
+                .iter()
+                .find(|node| match route_key_from_url(node) {
+                    Ok(route) => route == target,
+                    Err(_) => false,
+                })
+                .cloned()
+                .ok_or_else(|| anyhow::anyhow!("Redis Cluster 节点清单缺少重定向目标: {target}"))?
         };
-        let Some(local) = map.get(target) else {
-            return Ok(None);
-        };
-        let url = rewrite_redis_url(&self.url, &local.host, local.port)?;
         if debug_enabled() {
-            eprintln!(
-                "[rust-db-cli] redis connect redirected {} via {}:{}",
-                target, local.host, local.port
-            );
+            eprintln!("[rust-db-cli] redis connect redirected {} via {}", target, url);
         }
         let client = Client::open(url.as_str())?;
         let conn = timeout(
@@ -147,9 +153,11 @@ fn route_key_from_url(value: &str) -> Result<String> {
 fn parse_cluster_redirect(message: &str) -> Option<(String, String)> {
     let mut parts = message.split_whitespace();
     while let Some(part) = parts.next() {
-        if part == "MOVED" || part == "ASK" {
+        // redis-rs 会把服务端错误格式化成 `Moved:` / `Ask:`，这里统一规整后再判断。
+        let kind = part.trim_end_matches(':').to_ascii_uppercase();
+        if kind == "MOVED" || kind == "ASK" {
             let _slot = parts.next()?;
-            return Some((part.to_string(), parts.next()?.to_string()));
+            return Some((kind, parts.next()?.to_string()));
         }
     }
     None
