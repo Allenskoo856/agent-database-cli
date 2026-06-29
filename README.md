@@ -122,6 +122,8 @@ AGENT_DATABASE_CLI_CONFIG=/path/to/config.json agent-database-cli list
 | `blacklist` | 全部数据库 | 无 | 命令黑名单数组，大小写不敏感 |
 | `keepAliveSeconds` | 全部数据库 | `180` | 单个数据库连接空闲释放秒数 |
 
+PostgreSQL URL 支持 `sslmode` 参数：`disable`、`prefer`、`require`、`verify-ca`、`verify-full`。例如云数据库常用 `postgres://user:password@host:5432/app?sslmode=require`；生产环境需要校验证书时优先使用 `verify-full`。
+
 Redis 集群配置：
 
 | 字段 | 默认值 | 说明 |
