@@ -30,7 +30,7 @@ curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --defaul
 export PATH="${HOME}/.cargo/bin:${PATH}"
 rustc --version
 cargo --version
-ldd --version | head -n1
+ldd --version 2>&1 | sed -n "1p" || true
 
 echo "[uos-1050] Building agent-database-cli native binary..."
 cargo build --release --bin agent-database-cli
@@ -97,7 +97,7 @@ npm pack --pack-destination "${OUT_DIR}/npm" .
   echo "intended_os=UOS 1050 / Debian 10 (glibc 2.28)"
   echo "rustc=$(rustc --version)"
   echo "node=$(node -v)"
-  ldd --version | head -n1
+  ldd --version 2>&1 | sed -n "1p" || true
   file "${OUT_DIR}/agent-database-cli"
   echo "GLIBC symbols:"
   strings "${OUT_DIR}/agent-database-cli" | grep -o 'GLIBC_[0-9.]*' | sort -u || true
